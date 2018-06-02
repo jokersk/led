@@ -1,40 +1,58 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://github.com/vuejs/vue-cli/tree/dev/docs" target="_blank">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-typescript" target="_blank">typescript</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank">Twitter</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank">awesome-vue</a></li>
-    </ul>
+  <div class='container'>
+    <div class="card py-4">
+      <div>
+        <button type="button" @click='setTimer(1000 * 5)' class="btn btn-outline-primary mx-3">5 Second</button>
+        <button type="button" @click='setTimer(1000 * 30)' class="btn btn-outline-primary mx-3">30 seconds</button>
+        <button type="button" @click='setTimer(1000 * 60)' class="btn btn-outline-primary mx-3">60 Second</button>
+      </div>
+      <div class="result m-5">
+        <h2>
+          {{timer}}
+        </h2>
+      </div>
+      <div>
+        <button class='btn btn-outline-info' @click='off'>Off</button>
+      </div>
+      
+    </div>
+    
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-
+import "bootstrap/dist/css/bootstrap.css";
 @Component
 export default class HelloWorld extends Vue {
   @Prop() private msg!: string;
+
+  timer : number = 0
+  led : any
+  setTimer (time : number) {
+    this.timer = time / 1000
+    let t = setInterval(()=>{
+        this.timer--
+        if(this.timer <= 0) {
+            this.led.blink(1000 * 0.2);
+            clearInterval(t)
+        }
+    },1000) 
+           
+  }
+
+  off () {
+    this.led.off()
+  }
+
+mounted () {
+     boardReady({device: 'Jzv1'}, board => {
+            board.systemReset();
+            board.samplingInterval = 250;
+            this.led = getLed(board, 10);
+            console.log(this.led)
+     })
+  }
 }
 </script>
 
